@@ -104,7 +104,7 @@ dotnet test tests/JobPosting.API.Tests/JobPosting.API.Tests.csproj
 ```
 
 ## 6. Deployed URLs
-* **Frontend:** [Insert Frontend URL Here]
+* **Frontend:** https://se-4458-final-kariyet-net.vercel.app/
 * **API Gateway:** [Insert API Gateway URL Here]
 
 ---
@@ -172,4 +172,4 @@ Used to store semi-structured, high-throughput analytical documents such as sear
 ### ⚡ 3. Distributed Cache: Upstash Redis
 To prevent redundant database roundtrips, search results and active job details are cached with customizable time-to-live (TTL) strategies.
 * **Cache Key Schema (Active Job Postings):** `jobposting:{id}`
-* **Cache Key Schema (Query Results):** `jobsearch:{position}:{city}:{town}:{workingPreference}:{page}`
+* **Cache Key Schema (Query Results):** `jobsearch:{position}:{city}:{town}:{workingPreference}:{page}`
