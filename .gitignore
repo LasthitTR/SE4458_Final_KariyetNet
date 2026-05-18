@@ -1,0 +1,7 @@
+**/appsettings.Development.json
+**/appsettings.Production.json
+**/.env.local
+**/bin/
+**/obj/
+**/TestResults/
+**/node_modules/

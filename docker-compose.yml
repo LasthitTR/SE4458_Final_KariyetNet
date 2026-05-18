@@ -1,0 +1,127 @@
+version: '3.8'
+
+services:
+  # 1. PostgreSQL (İlişkisel Veriler: İş ilanları, şirket bilgileri vb.)
+  postgres-db:
+    image: postgres:15-alpine
+    container_name: postgres-jobposting
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: adminpassword
+      POSTGRES_DB: JobPostingDb
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: always
+
+  # 2. MongoDB (NoSQL: Kullanıcı aramaları, loglar vb.)
+  mongodb:
+    image: mongo:6.0
+    container_name: mongodb-jobsearch
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: adminpassword
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    restart: always
+
+  # 3. Redis (Cache: İlanları önbellekleme)
+  redis:
+    image: redis:alpine
+    container_name: redis-cache
+    ports:
+      - "6379:6379"
+    restart: always
+
+  # 4. RabbitMQ (Mesaj Kuyruğu: Event-driven iletişim)
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: rabbitmq-eventbus
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    ports:
+      - "5672:5672"   # AMQP portu
+      - "15672:15672" # Management UI portu
+    restart: always
+
+  # Backend services for local integration
+  jobposting:
+    build: ./src/Services/JobPosting/JobPosting.API
+    container_name: jobposting-api
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Host=postgres-db;Port=5432;Database=JobPostingDb;Username=admin;Password=adminpassword
+      - RabbitMq__Host=rabbitmq
+      - Redis__Configuration=redis:6379
+      - ASPNETCORE_URLS=http://+:8080
+    ports:
+      - "5001:8080"
+    depends_on:
+      - postgres-db
+      - rabbitmq
+      - redis
+
+  jobsearch:
+    build: ./src/Services/JobSearch/JobSearch.API
+    container_name: jobsearch-api
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - MongoSettings__ConnectionString=mongodb://admin:adminpassword@mongodb:27017
+      - MongoSettings__Database=JobSearchDb
+      - Redis__Configuration=redis:6379
+      - ASPNETCORE_URLS=http://+:8080
+    ports:
+      - "5002:8080"
+    depends_on:
+      - mongodb
+      - redis
+
+  notification:
+    build: ./src/Services/Notification/Notification.Worker
+    container_name: notification-worker
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__NotificationDb=Host=postgres-db;Port=5432;Database=NotificationDb;Username=admin;Password=adminpassword
+      - RabbitMq__Host=rabbitmq
+      - ASPNETCORE_URLS=http://+:8080
+    ports:
+      - "5003:8080"
+    depends_on:
+      - postgres-db
+      - rabbitmq
+
+  aiagent:
+    build: ./src/Services/AIAgent/AIAgent.API
+    container_name: ai-agent-api
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - HF_TOKEN=${HF_TOKEN}
+      - ApiGatewayUrl=http://ocelot:5000
+      - ASPNETCORE_URLS=http://+:8080
+    ports:
+      - "5004:8080"
+    depends_on:
+      - jobsearch
+      - jobposting
+
+  ocelot:
+    build: ./src/ApiGateway/OcelotApiGw
+    container_name: ocelot-gateway
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:5000
+    ports:
+      - "5000:5000"
+    depends_on:
+      - jobposting
+      - jobsearch
+    volumes:
+      - ./src/ApiGateway/OcelotApiGw/ocelot.json:/app/ocelot.json:ro
+
+volumes:
+  postgres_data:
+  mongodb_data:

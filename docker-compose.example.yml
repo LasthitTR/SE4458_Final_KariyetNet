@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  postgres-db:
+    image: postgres:15-alpine
+    container_name: postgres-jobposting
+    environment:
+      POSTGRES_USER: YOUR_POSTGRES_USER
+      POSTGRES_PASSWORD: YOUR_POSTGRES_PASSWORD
+      POSTGRES_DB: JobPostingDb
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: always
+
+  mongodb:
+    image: mongo:6.0
+    container_name: mongodb-jobsearch
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: YOUR_MONGO_ROOT_USER
+      MONGO_INITDB_ROOT_PASSWORD: YOUR_MONGO_ROOT_PASSWORD
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    restart: always
+
+  redis:
+    image: redis:alpine
+    container_name: redis-cache
+    ports:
+      - "6379:6379"
+    restart: always
+
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: rabbitmq-eventbus
+    environment:
+      RABBITMQ_DEFAULT_USER: YOUR_RABBITMQ_USER
+      RABBITMQ_DEFAULT_PASS: YOUR_RABBITMQ_PASSWORD
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    restart: always
+
+volumes:
+  postgres_data:
+  mongodb_data:
