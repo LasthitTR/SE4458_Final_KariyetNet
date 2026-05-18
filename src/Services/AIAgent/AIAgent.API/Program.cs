@@ -2,7 +2,10 @@ using AIAgent.API.Services;
 using Asp.Versioning;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.WebHost.UseUrls("http://localhost:5004");
+if (builder.Environment.IsDevelopment())
+{
+    builder.WebHost.UseUrls("http://localhost:5004");
+}
 
 // HttpClient DI (Gemini ve API Gateway'e istek atmak için)
 builder.Services.AddHttpClient<IAiAgentService, AiAgentService>();

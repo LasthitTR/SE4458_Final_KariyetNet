@@ -3,7 +3,10 @@ using JobSearch.API.Services;
 using JobSearch.API.Settings;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.WebHost.UseUrls("http://localhost:5002");
+if (builder.Environment.IsDevelopment())
+{
+    builder.WebHost.UseUrls("http://localhost:5002");
+}
 
 // Add services to the container.
 
