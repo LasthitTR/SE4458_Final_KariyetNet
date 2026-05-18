@@ -29,6 +29,47 @@ namespace JobSearch.API.Services
             _testSearchHistory = testSearchHistory;
         }
 
+        private static string NormalizeForSearch(string? value)
+        {
+            if (string.IsNullOrEmpty(value)) return string.Empty;
+
+            var sb = new System.Text.StringBuilder();
+            foreach (var c in value.Trim())
+            {
+                char newChar = char.ToLowerInvariant(c);
+                switch (newChar)
+                {
+                    case 'ı':
+                    case 'İ':
+                    case 'i':
+                        newChar = 'i';
+                        break;
+                    case 'ş':
+                    case 'Ş':
+                        newChar = 's';
+                        break;
+                    case 'ğ':
+                    case 'Ğ':
+                        newChar = 'g';
+                        break;
+                    case 'ü':
+                    case 'Ü':
+                        newChar = 'u';
+                        break;
+                    case 'ö':
+                    case 'Ö':
+                        newChar = 'o';
+                        break;
+                    case 'ç':
+                    case 'Ç':
+                        newChar = 'c';
+                        break;
+                }
+                sb.Append(newChar);
+            }
+            return sb.ToString();
+        }
+
         public async Task<IEnumerable<JobPostingDto>> SearchJobsAsync(string? position, string? city, string? town, string? workingPreference, string? userId, int pageNumber = 1, int pageSize = 10)
         {
             // 1. Redis'ten ilanları çek (Gerçek senaryoda daha dinamik veya pattern-based bir query gerekebilir)
@@ -40,28 +81,26 @@ namespace JobSearch.API.Services
                 jobPostings = JsonSerializer.Deserialize<IEnumerable<JobPostingDto>>(cachedData) ?? new List<JobPostingDto>();
             }
 
-            // 2. RAM üzerinde Linq ile filtrele (Türkçe karakter duyarlı büyük/küçük harf eşleştirmesi)
-            var tr = System.Globalization.CultureInfo.GetCultureInfo("tr-TR");
-
+            // 2. RAM üzerinde Linq ile filtrele (Türkçe ve İngilizce karakter duyarlı normalizasyonlu arama)
             if (!string.IsNullOrEmpty(position))
             {
-                var posLower = position.ToLower(tr);
-                jobPostings = jobPostings.Where(j => j.Title.ToLower(tr).Contains(posLower));
+                var posNormalized = NormalizeForSearch(position);
+                jobPostings = jobPostings.Where(j => NormalizeForSearch(j.Title).Contains(posNormalized));
             }
             if (!string.IsNullOrEmpty(city))
             {
-                var cityLower = city.ToLower(tr);
-                jobPostings = jobPostings.Where(j => j.City.ToLower(tr).Equals(cityLower));
+                var cityNormalized = NormalizeForSearch(city);
+                jobPostings = jobPostings.Where(j => NormalizeForSearch(j.City).Equals(cityNormalized));
             }
             if (!string.IsNullOrEmpty(town))
             {
-                var townLower = town.ToLower(tr);
-                jobPostings = jobPostings.Where(j => j.Town.ToLower(tr).Equals(townLower));
+                var townNormalized = NormalizeForSearch(town);
+                jobPostings = jobPostings.Where(j => NormalizeForSearch(j.Town).Equals(townNormalized));
             }
             if (!string.IsNullOrEmpty(workingPreference))
             {
-                var wpLower = workingPreference.ToLower(tr);
-                jobPostings = jobPostings.Where(j => j.WorkingPreference.ToLower(tr).Equals(wpLower));
+                var wpNormalized = NormalizeForSearch(workingPreference);
+                jobPostings = jobPostings.Where(j => NormalizeForSearch(j.WorkingPreference).Equals(wpNormalized));
             }
 
 

@@ -18,16 +18,57 @@ namespace AIAgent.API.Services
             _logger = logger;
         }
 
+        private static string NormalizeForSearch(string? value)
+        {
+            if (string.IsNullOrEmpty(value)) return string.Empty;
+
+            var sb = new System.Text.StringBuilder();
+            foreach (var c in value.Trim())
+            {
+                char newChar = char.ToLowerInvariant(c);
+                switch (newChar)
+                {
+                    case 'ı':
+                    case 'İ':
+                    case 'i':
+                        newChar = 'i';
+                        break;
+                    case 'ş':
+                    case 'Ş':
+                        newChar = 's';
+                        break;
+                    case 'ğ':
+                    case 'Ğ':
+                        newChar = 'g';
+                        break;
+                    case 'ü':
+                    case 'Ü':
+                        newChar = 'u';
+                        break;
+                    case 'ö':
+                    case 'Ö':
+                        newChar = 'o';
+                        break;
+                    case 'ç':
+                    case 'Ç':
+                        newChar = 'c';
+                        break;
+                }
+                sb.Append(newChar);
+            }
+            return sb.ToString();
+        }
+
         public async Task<string> ProcessUserMessageAsync(string message, string? userId)
         {
             try
             {
                 _logger.LogInformation("Hugging Face Entegrasyonu Çalışıyor. Girdi: {Message}", message);
 
-                var cleanMessage = message.Trim().ToLower(new System.Globalization.CultureInfo("tr-TR"));
+                var cleanMessage = NormalizeForSearch(message);
 
                 // 1. Genel sohbet kontrolü (Arama niyeti yoksa doğrudan sohbet cevabı ver)
-                if (cleanMessage == "selam" || cleanMessage == "merhaba" || cleanMessage == "nasılsın" || cleanMessage.StartsWith("hey") || cleanMessage == "naber")
+                if (cleanMessage == "selam" || cleanMessage == "merhaba" || cleanMessage == "nasilsin" || cleanMessage.StartsWith("hey") || cleanMessage == "naber")
                 {
                     var chatSystemPrompt = "Sen bir kariyer asistanısın. Kullanıcıya samimi, profesyonel ve kısa bir Türkçe karşılama mesajı yaz. Ona nasıl yardımcı olabileceğini sor. (Örn: İstanbul'da yazılım ilanlarını bulabilirim)";
                     return await CallHuggingFaceApiAsync(chatSystemPrompt, message);
@@ -70,8 +111,8 @@ namespace AIAgent.API.Services
                     else if (cleanMessage.Contains("istanbul")) city = "İstanbul";
                     else if (cleanMessage.Contains("ankara")) city = "Ankara";
 
-                    if (cleanMessage.Contains("yazılım") || cleanMessage.Contains("mühendis") || cleanMessage.Contains("developer")) position = "yazılım";
-                    else if (cleanMessage.Contains("siber") || cleanMessage.Contains("güvenlik")) position = "siber";
+                    if (cleanMessage.Contains("yazilim") || cleanMessage.Contains("muhendis") || cleanMessage.Contains("developer")) position = "yazılım";
+                    else if (cleanMessage.Contains("siber") || cleanMessage.Contains("guvenlik")) position = "siber";
                 }
 
                 // Eğer hiçbir arama parametresi yakalanamadıysa kullanıcıyı kibarca yönlendir
