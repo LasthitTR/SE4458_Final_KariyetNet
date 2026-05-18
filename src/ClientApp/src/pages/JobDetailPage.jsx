@@ -60,13 +60,13 @@ export default function JobDetailPage() {
 
     setApplying(true);
     try {
-      // 1. MongoDB'de başvuruyu kaydet (Tekrar başvurmayı önlemek için)
-      await axiosClient.post(`/api/v1/jobsearch/apply?userId=${user.uid}&jobId=${id}`);
-
-      // 2. PostgreSQL'de applicationCount alanını bir arttırıp PUT atarak güncelle
+      // 1. MongoDB'de başvuruyu kaydet ve PostgreSQL'de applicationCount'u paralel olarak güncelle
       const updatedJob = { ...job, applicationCount: (job.applicationCount || 0) + 1 };
 
-      await axiosClient.put(`/api/v1/jobpostings/${id}`, updatedJob);
+      await Promise.all([
+        axiosClient.post(`/api/v1/jobsearch/apply?userId=${user.uid}&jobId=${id}`),
+        axiosClient.put(`/api/v1/jobpostings/${id}`, updatedJob)
+      ]);
 
       setJob(updatedJob);
       setApplied(true);
