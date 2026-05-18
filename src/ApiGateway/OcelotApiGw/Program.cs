@@ -11,6 +11,10 @@ if (builder.Environment.IsDevelopment())
 
 // Ocelot Configuration
 builder.Configuration.AddJsonFile("ocelot.json", optional: false, reloadOnChange: true);
+if (builder.Environment.IsDevelopment())
+{
+    builder.Configuration.AddJsonFile("ocelot.Development.json", optional: true, reloadOnChange: true);
+}
 
 // IAM - JWT Bearer Auth Configuration (Örn: Supabase / Firebase)
 var authority = builder.Configuration["JwtSettings:Authority"];

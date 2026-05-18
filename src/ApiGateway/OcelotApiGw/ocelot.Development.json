@@ -2,11 +2,11 @@
   "Routes": [
     {
       "DownstreamPathTemplate": "/api/v1/jobpostings",
-      "DownstreamScheme": "https",
+      "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "kariyernet-jobposting-api.onrender.com",
-          "Port": 443
+          "Host": "localhost",
+          "Port": 5001
         }
       ],
       "UpstreamPathTemplate": "/api/v1/jobpostings",
@@ -14,11 +14,11 @@
     },
     {
       "DownstreamPathTemplate": "/api/v1/jobpostings/{everything}",
-      "DownstreamScheme": "https",
+      "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "kariyernet-jobposting-api.onrender.com",
-          "Port": 443
+          "Host": "localhost",
+          "Port": 5001
         }
       ],
       "UpstreamPathTemplate": "/api/v1/jobpostings/{everything}",
@@ -26,11 +26,11 @@
     },
     {
       "DownstreamPathTemplate": "/api/v1/jobpostings",
-      "DownstreamScheme": "https",
+      "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "kariyernet-jobposting-api.onrender.com",
-          "Port": 443
+          "Host": "localhost",
+          "Port": 5001
         }
       ],
       "UpstreamPathTemplate": "/api/v1/jobpostings",
@@ -38,11 +38,11 @@
     },
     {
       "DownstreamPathTemplate": "/api/v1/jobpostings/{everything}",
-      "DownstreamScheme": "https",
+      "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "kariyernet-jobposting-api.onrender.com",
-          "Port": 443
+          "Host": "localhost",
+          "Port": 5001
         }
       ],
       "UpstreamPathTemplate": "/api/v1/jobpostings/{everything}",
@@ -50,11 +50,11 @@
     },
     {
       "DownstreamPathTemplate": "/api/v1/jobsearch/{everything}",
-      "DownstreamScheme": "https",
+      "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "kariyernet-jobsearch-api.onrender.com",
-          "Port": 443
+          "Host": "localhost",
+          "Port": 5002
         }
       ],
       "UpstreamPathTemplate": "/api/v1/jobsearch/{everything}",
@@ -62,11 +62,11 @@
     },
     {
       "DownstreamPathTemplate": "/api/v1/jobalerts",
-      "DownstreamScheme": "https",
+      "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "kariyernet-jobposting-api.onrender.com",
-          "Port": 443
+          "Host": "localhost",
+          "Port": 5003
         }
       ],
       "UpstreamPathTemplate": "/api/v1/jobalerts",
@@ -78,11 +78,11 @@
     },
     {
       "DownstreamPathTemplate": "/api/v1/chat",
-      "DownstreamScheme": "https",
+      "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "kariyernet-aiagent-api.onrender.com",
-          "Port": 443
+          "Host": "localhost",
+          "Port": 5004
         }
       ],
       "UpstreamPathTemplate": "/api/v1/chat",
