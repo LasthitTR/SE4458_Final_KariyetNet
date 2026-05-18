@@ -11,8 +11,7 @@ namespace JobSearch.API.Models
 
         public string UserId { get; set; } = string.Empty;
         
-        [BsonGuidRepresentation(GuidRepresentation.Standard)]
-        public Guid JobId { get; set; }
+        public string JobId { get; set; } = string.Empty;
         
         public DateTime AppliedAt { get; set; } = DateTime.UtcNow;
     }

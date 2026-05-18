@@ -152,9 +152,10 @@ namespace JobSearch.API.Services
 
         public async Task<bool> HasAppliedAsync(string userId, Guid jobId)
         {
+            var jobIdStr = jobId.ToString();
             var filter = Builders<JobApplication>.Filter.And(
                 Builders<JobApplication>.Filter.Eq(a => a.UserId, userId),
-                Builders<JobApplication>.Filter.Eq(a => a.JobId, jobId)
+                Builders<JobApplication>.Filter.Eq(a => a.JobId, jobIdStr)
             );
             var count = await _jobApplicationsCollection.CountDocumentsAsync(filter);
             return count > 0;
@@ -167,7 +168,7 @@ namespace JobSearch.API.Services
             var application = new JobApplication
             {
                 UserId = userId,
-                JobId = jobId,
+                JobId = jobId.ToString(),
                 AppliedAt = DateTime.UtcNow
             };
             await _jobApplicationsCollection.InsertOneAsync(application);
