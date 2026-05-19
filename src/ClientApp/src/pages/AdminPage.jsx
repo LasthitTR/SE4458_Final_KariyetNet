@@ -78,6 +78,35 @@ export default function AdminPage() {
     );
   }
 
+  if (!user) {
+    return (
+      <div className="min-h-[70vh] flex items-center justify-center px-4 animate-fade-in-up">
+        <div className="bg-white p-10 rounded-3xl shadow-2xl w-full max-w-md border border-gray-100 relative overflow-hidden text-center">
+          {/* Decorative background element */}
+          <div className="absolute -top-24 -right-24 w-48 h-48 bg-blue-50 rounded-full blur-3xl"></div>
+          
+          <div className="w-20 h-20 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-inner relative z-10">
+            <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+            </svg>
+          </div>
+          
+          <h2 className="text-2xl font-extrabold text-gray-900 mb-3 relative z-10">Giriş Yapmanız Gerekiyor</h2>
+          <p className="text-gray-500 mb-8 text-sm relative z-10 leading-relaxed">
+            Sisteme yeni bir iş ilanı eklemek için lütfen önce giriş yapın veya üye olun.
+          </p>
+          
+          <button 
+            onClick={() => navigate('/login', { state: { from: '/isveren' } })}
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 rounded-xl transition-all shadow-md hover:shadow-blue-500/40 relative z-10"
+          >
+            Giriş Sayfasına Git
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-4xl mx-auto pb-10">
       <div className="mb-8">
