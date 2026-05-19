@@ -64,6 +64,31 @@ namespace Notification.Worker.Controllers
             await _context.SaveChangesAsync();
             return Ok(notification);
         }
+
+        // DELETE /api/v1/notifications/{id} - Tek bir bildirimi sil
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteNotification(Guid id)
+        {
+            var notification = await _context.UserNotifications.FindAsync(id);
+            if (notification == null) return NotFound();
+
+            _context.UserNotifications.Remove(notification);
+            await _context.SaveChangesAsync();
+            return Ok(new { success = true });
+        }
+
+        // DELETE /api/v1/notifications/user/{userId} - Kullanıcının tüm bildirimlerini sil
+        [HttpDelete("user/{userId}")]
+        public async Task<IActionResult> DeleteAllUserNotifications(string userId)
+        {
+            var notifications = await _context.UserNotifications
+                .Where(n => n.UserId == userId)
+                .ToListAsync();
+
+            _context.UserNotifications.RemoveRange(notifications);
+            await _context.SaveChangesAsync();
+            return Ok(new { deletedCount = notifications.Count });
+        }
     }
 
     public class TestNotificationRequest

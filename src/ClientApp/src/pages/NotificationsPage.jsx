@@ -15,24 +15,29 @@ export default function NotificationsPage() {
   const [alertsLoading, setAlertsLoading] = useState(false);
 
   // Bildirimleri Getir
-  useEffect(() => {
-    if (!user) { navigate('/'); return; }
-
-    const fetchNotifications = async () => {
-      try {
-        const { data } = await axiosClient.get(`/api/v1/notifications/${user.uid}`);
-        setNotifications(Array.isArray(data) ? data : []);
-        // Hepsini okundu yap
-        if (data && data.some(n => !n.isRead)) {
-          await axiosClient.put(`/api/v1/notifications/${user.uid}/read-all`);
-        }
-      } catch (err) {
-        console.error('Bildirimler alınamadı:', err);
-      } finally {
-        setLoading(false);
+  const fetchNotifications = async () => {
+    if (!user) return;
+    setLoading(true);
+    try {
+      const { data } = await axiosClient.get(`/api/v1/notifications/${user.uid}`);
+      setNotifications(Array.isArray(data) ? data : []);
+      // Hepsini okundu yap
+      if (data && data.some(n => !n.isRead)) {
+        await axiosClient.put(`/api/v1/notifications/${user.uid}/read-all`);
       }
-    };
-    fetchNotifications();
+    } catch (err) {
+      console.error('Bildirimler alınamadı:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (user) {
+      fetchNotifications();
+    } else {
+      navigate('/');
+    }
   }, [user, navigate]);
 
   // Alarmları Getir
@@ -55,6 +60,32 @@ export default function NotificationsPage() {
     }
   }, [activeTab]);
 
+  // Tek bildirim sil
+  const handleDeleteNotification = async (notifId, e) => {
+    e.stopPropagation();
+    if (!window.confirm('Bu bildirimi silmek istediğinizden emin misiniz?')) return;
+
+    try {
+      await axiosClient.delete(`/api/v1/notifications/${notifId}`);
+      setNotifications(prev => prev.filter(n => n.id !== notifId));
+    } catch (err) {
+      console.error('Bildirim silinemedi:', err);
+    }
+  };
+
+  // Tüm bildirimleri sil
+  const handleDeleteAllNotifications = async () => {
+    if (!window.confirm('Tüm bildirimlerinizi silmek istediğinizden emin misiniz?')) return;
+
+    try {
+      await axiosClient.delete(`/api/v1/notifications/user/${user.uid}`);
+      setNotifications([]);
+    } catch (err) {
+      console.error('Tüm bildirimler silinemedi:', err);
+    }
+  };
+
+  // Alarm sil
   const handleDeleteAlert = async (alertId, e) => {
     e.stopPropagation();
     if (!window.confirm('Bu iş alarmını silmek istediğinizden emin misiniz?')) return;
@@ -78,43 +109,40 @@ export default function NotificationsPage() {
   return (
     <div className="max-w-2xl mx-auto py-8 px-4">
       {/* Üst Kısım */}
-      <div className="mb-8 flex justify-between items-start gap-4 flex-wrap">
-        <div>
-          <h1 className="text-3xl font-extrabold text-gray-800">🔔 Bildirimler & Alarmlar</h1>
-          <p className="text-gray-500 mt-1 text-sm">İş alarmlarınızı yönetin ve bildirimlerinizi görün.</p>
-        </div>
-        <button
-          onClick={async () => {
-            if (!user) return;
-            try {
-              await axiosClient.post('/api/v1/notifications/test', { userId: user.uid });
-              // Bildirimleri tekrar çekip listeyi güncelle
-              const { data } = await axiosClient.get(`/api/v1/notifications/${user.uid}`);
-              setNotifications(Array.isArray(data) ? data : []);
-            } catch (err) {
-              console.error('Test bildirimi tetiklenemedi:', err);
-            }
-          }}
-          className="bg-indigo-50 text-indigo-700 hover:bg-indigo-600 hover:text-white border border-indigo-200 font-bold px-4 py-2 rounded-xl text-xs transition-all shadow-sm"
-        >
-          ⚡ Test Bildirimi Gönder
-        </button>
+      <div className="mb-8">
+        <h1 className="text-3xl font-extrabold text-gray-800">🔔 Bildirimler & Alarmlar</h1>
+        <p className="text-gray-500 mt-1 text-sm">İş alarmlarınızı yönetin ve bildirimlerinizi görün.</p>
       </div>
 
       {/* Sekme Seçici */}
-      <div className="flex border-b border-gray-200 mb-6 gap-2">
-        <button
-          onClick={() => setActiveTab('notifications')}
-          className={`pb-3 px-4 font-bold text-sm transition-all border-b-2 ${activeTab === 'notifications' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-800'}`}
-        >
-          Gelen Bildirimler ({notifications.length})
-        </button>
-        <button
-          onClick={() => setActiveTab('alerts')}
-          className={`pb-3 px-4 font-bold text-sm transition-all border-b-2 ${activeTab === 'alerts' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-800'}`}
-        >
-          Kayıtlı Alarmlarım ({alerts.length})
-        </button>
+      <div className="flex border-b border-gray-200 mb-6 gap-2 items-center justify-between">
+        <div className="flex gap-2">
+          <button
+            onClick={() => setActiveTab('notifications')}
+            className={`pb-3 px-4 font-bold text-sm transition-all border-b-2 ${activeTab === 'notifications' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-800'}`}
+          >
+            Gelen Bildirimler ({notifications.length})
+          </button>
+          <button
+            onClick={() => setActiveTab('alerts')}
+            className={`pb-3 px-4 font-bold text-sm transition-all border-b-2 ${activeTab === 'alerts' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-800'}`}
+          >
+            Kayıtlı Alarmlarım ({alerts.length})
+          </button>
+        </div>
+
+        {/* Tümünü Sil butonu (Sadece Bildirimler sekmesindeyken ve bildirim varsa gösterilir) */}
+        {activeTab === 'notifications' && notifications.length > 0 && (
+          <button
+            onClick={handleDeleteAllNotifications}
+            className="text-xs text-red-600 hover:text-red-800 font-bold flex items-center gap-1.5 px-3 py-1.5 rounded-lg hover:bg-red-50 transition border border-transparent hover:border-red-100 mb-2"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+            </svg>
+            Tümünü Sil
+          </button>
+        )}
       </div>
 
       {/* SEKMELERİN İÇERİĞİ */}
@@ -137,7 +165,7 @@ export default function NotificationsPage() {
               <div
                 key={notif.id}
                 onClick={() => notif.jobId && navigate(`/job/${notif.jobId}`)}
-                className={`bg-white rounded-2xl border p-5 flex items-start gap-4 shadow-sm transition-all ${notif.jobId ? 'cursor-pointer hover:shadow-md hover:border-blue-300' : ''} ${!notif.isRead ? 'border-blue-200 bg-blue-50/20' : 'border-gray-200'}`}
+                className={`bg-white rounded-2xl border p-5 flex items-start gap-4 shadow-sm transition-all relative group ${notif.jobId ? 'cursor-pointer hover:shadow-md hover:border-blue-300' : ''} ${!notif.isRead ? 'border-blue-200 bg-blue-50/20' : 'border-gray-200'}`}
               >
                 <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${notif.title?.includes('Özel') ? 'bg-purple-100 text-purple-600' : 'bg-blue-100 text-blue-600'}`}>
                   {notif.title?.includes('Özel') ? (
@@ -150,7 +178,7 @@ export default function NotificationsPage() {
                     </svg>
                   )}
                 </div>
-                <div className="flex-1 min-w-0">
+                <div className="flex-1 min-w-0 pr-8">
                   <div className="flex items-center justify-between gap-2">
                     <p className="font-bold text-gray-800 text-sm">{notif.title}</p>
                     {!notif.isRead && <span className="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0"></span>}
@@ -160,11 +188,26 @@ export default function NotificationsPage() {
                     {new Date(notif.createdAt).toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' })}
                   </p>
                 </div>
-                {notif.jobId && (
-                  <svg className="w-5 h-5 text-gray-400 flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
-                  </svg>
-                )}
+
+                <div className="flex items-center gap-2 flex-shrink-0 self-center">
+                  {/* Bildirim Silme Butonu */}
+                  <button
+                    onClick={(e) => handleDeleteNotification(notif.id, e)}
+                    className="w-9 h-9 rounded-xl hover:bg-red-50 text-gray-400 hover:text-red-600 flex items-center justify-center border border-gray-100 hover:border-red-200 transition"
+                    title="Bildirimi Sil"
+                  >
+                    <svg className="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                  </button>
+
+                  {/* Yönlendirme İkonu */}
+                  {notif.jobId && (
+                    <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+                    </svg>
+                  )}
+                </div>
               </div>
             ))}
           </div>
@@ -197,7 +240,6 @@ export default function NotificationsPage() {
                 onClick={() => handleAlertClick(alert)}
                 className="bg-white rounded-2xl border border-gray-200 p-5 flex items-center justify-between gap-4 shadow-sm cursor-pointer hover:shadow-md hover:border-indigo-300 transition-all"
               >
-                {/* Sol Kısım: Alarm Bilgileri */}
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
                     <span className="bg-indigo-50 text-indigo-700 font-bold text-xs px-2.5 py-1 rounded-lg border border-indigo-100">
@@ -209,20 +251,16 @@ export default function NotificationsPage() {
                       </span>
                     )}
                   </div>
-
                   <p className="text-gray-400 text-xs mt-3">
                     Kayıt Tarihi: {new Date(alert.createdAt).toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' })}
                   </p>
                 </div>
 
-                {/* Sağ Kısım: Sonuç Sayısı ve Silme */}
                 <div className="flex items-center gap-4">
-                  {/* Eşleşen Sonuç Sayısı */}
                   <span className={`text-xs font-extrabold px-3 py-1.5 rounded-full ${alert.matchCount > 0 ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
                     {alert.matchCount} Sonuç
                   </span>
 
-                  {/* Sil Butonu */}
                   <button
                     onClick={(e) => handleDeleteAlert(alert.id, e)}
                     className="w-9 h-9 rounded-xl hover:bg-red-50 text-gray-400 hover:text-red-600 flex items-center justify-center border border-gray-100 hover:border-red-200 transition"
