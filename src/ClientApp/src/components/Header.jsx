@@ -100,6 +100,11 @@ export default function Header() {
             <Link to="/isveren" className="text-gray-600 hover:text-blue-600 font-medium px-4 py-2">
               İşveren
             </Link>
+            {user && (
+              <Link to="/bildirimlerim" className="text-blue-600 hover:text-blue-700 font-semibold px-4 py-2 bg-blue-50 rounded-xl transition">
+                Bildirimlerim
+              </Link>
+            )}
 
             {user ? (
               <div className="flex items-center gap-3">
@@ -157,16 +162,14 @@ export default function Header() {
                           ))
                         )}
                       </div>
-                      {notifications.length > 0 && (
-                        <div className="border-t border-gray-100 p-2">
-                          <button
-                            onClick={() => { navigate('/bildirimlerim'); setIsNotifOpen(false); }}
-                            className="w-full text-center text-sm text-blue-600 font-semibold py-2 rounded-xl hover:bg-blue-50 transition"
-                          >
-                            Tüm Bildirimleri Gör →
-                          </button>
-                        </div>
-                      )}
+                      <div className="border-t border-gray-100 p-2">
+                        <button
+                          onClick={() => { navigate('/bildirimlerim'); setIsNotifOpen(false); }}
+                          className="w-full text-center text-sm text-blue-600 font-semibold py-2 rounded-xl hover:bg-blue-50 transition"
+                        >
+                          Tüm Bildirimleri Gör →
+                        </button>
+                      </div>
                     </div>
                   )}
                 </div>
