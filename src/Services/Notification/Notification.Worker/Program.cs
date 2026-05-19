@@ -45,13 +45,13 @@ builder.Services.AddMassTransit(x =>
 // 3. Quartz.NET (Zamanlanmış Görevler)
 builder.Services.AddQuartz(q =>
 {
-    // JobAlertNotificationTask (Örn: Her 5 dakikada bir)
+    // JobAlertNotificationTask (Hızlı eşleşme için her 30 saniyede bir)
     var jobKey1 = new JobKey("JobAlertNotificationTask");
     q.AddJob<JobAlertNotificationTask>(opts => opts.WithIdentity(jobKey1));
     q.AddTrigger(opts => opts
         .ForJob(jobKey1)
         .WithIdentity("JobAlertNotificationTask-trigger")
-        .WithSimpleSchedule(x => x.WithIntervalInMinutes(5).RepeatForever()));
+        .WithSimpleSchedule(x => x.WithIntervalInSeconds(30).RepeatForever()));
 
     // RelatedJobNotificationTask (Örn: Her gün gece 02:00'de veya test için 10 dk'da bir)
     var jobKey2 = new JobKey("RelatedJobNotificationTask");
