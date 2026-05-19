@@ -116,4 +116,7 @@ using (var scope = app.Services.CreateScope())
 app.UseRouting();
 app.MapControllers();
 
+app.MapGet("/", () => "Notification Worker is running.");
+app.MapGet("/health", () => Results.Ok("Healthy"));
+
 app.Run();
