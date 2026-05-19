@@ -6,7 +6,10 @@ using Notification.Worker.Tasks;
 using Quartz;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.WebHost.UseUrls("http://localhost:5003"); // Worker Service as Hosted Service via WebApplicationBuilder (or Host.CreateApplicationBuilder)
+if (builder.Environment.IsDevelopment())
+{
+    builder.WebHost.UseUrls("http://localhost:5003"); // Worker Service as Hosted Service via WebApplicationBuilder (or Host.CreateApplicationBuilder)
+}
 
 // 1. PostgreSQL DB Context
 builder.Services.AddDbContext<NotificationDbContext>(options =>

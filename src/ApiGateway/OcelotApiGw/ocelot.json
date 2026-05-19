@@ -65,7 +65,7 @@
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
-          "Host": "kariyernet-jobposting-api.onrender.com",
+          "Host": "kariyernet-notification-worker.onrender.com",
           "Port": 443
         }
       ],
