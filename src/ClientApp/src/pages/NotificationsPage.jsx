@@ -78,9 +78,27 @@ export default function NotificationsPage() {
   return (
     <div className="max-w-2xl mx-auto py-8 px-4">
       {/* Üst Kısım */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-extrabold text-gray-800">🔔 Bildirimler & Alarmlar</h1>
-        <p className="text-gray-500 mt-1 text-sm">İş alarmlarınızı yönetin ve bildirimlerinizi görün.</p>
+      <div className="mb-8 flex justify-between items-start gap-4 flex-wrap">
+        <div>
+          <h1 className="text-3xl font-extrabold text-gray-800">🔔 Bildirimler & Alarmlar</h1>
+          <p className="text-gray-500 mt-1 text-sm">İş alarmlarınızı yönetin ve bildirimlerinizi görün.</p>
+        </div>
+        <button
+          onClick={async () => {
+            if (!user) return;
+            try {
+              await axiosClient.post('/api/v1/notifications/test', { userId: user.uid });
+              // Bildirimleri tekrar çekip listeyi güncelle
+              const { data } = await axiosClient.get(`/api/v1/notifications/${user.uid}`);
+              setNotifications(Array.isArray(data) ? data : []);
+            } catch (err) {
+              console.error('Test bildirimi tetiklenemedi:', err);
+            }
+          }}
+          className="bg-indigo-50 text-indigo-700 hover:bg-indigo-600 hover:text-white border border-indigo-200 font-bold px-4 py-2 rounded-xl text-xs transition-all shadow-sm"
+        >
+          ⚡ Test Bildirimi Gönder
+        </button>
       </div>
 
       {/* Sekme Seçici */}
