@@ -34,7 +34,7 @@ export default function AiAgentChat() {
     try {
       const payload = { message: userMessage };
       if (user) {
-        payload.userId = user.id; // Eğer giriş yapmışsa backend'e ID'sini gönderiyoruz
+        payload.userId = user.uid; // Eğer giriş yapmışsa backend'e ID'sini gönderiyoruz
       }
       
       // Ocelot üzerinden Chat endpointine istek atılıyor

@@ -63,7 +63,7 @@ export default function HomePage() {
       if (user) {
         try {
           const timestamp = new Date().getTime();
-          const { data } = await axiosClient.get(`/api/v1/jobsearch/recent-searches/${user.id}?_t=${timestamp}`);
+          const { data } = await axiosClient.get(`/api/v1/jobsearch/recent-searches/${user.uid}?_t=${timestamp}`);
           setRecentSearches(data);
         } catch (error) {
           console.error("Recent searches error:", error);

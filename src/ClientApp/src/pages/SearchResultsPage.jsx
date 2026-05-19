@@ -53,7 +53,7 @@ export default function SearchResultsPage() {
       if (workingPreference) params.append('workingPreference', workingPreference);
       
       // Kullanıcı giriş yapmışsa backend'e ID yolluyoruz ki arama geçmişine (MongoDB) kaydedilsin
-      if (user) params.append('userId', user.id); 
+      if (user) params.append('userId', user.uid); 
       
       params.append('pageNumber', currentPage);
       params.append('pageSize', 10);
