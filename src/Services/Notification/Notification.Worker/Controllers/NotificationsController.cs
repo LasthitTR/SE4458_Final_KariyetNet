@@ -65,8 +65,8 @@ namespace Notification.Worker.Controllers
             return Ok(notification);
         }
 
-        // GET /api/v1/notifications/debug-unprocessed - Debug verilerini getir
-        [HttpGet("debug-unprocessed")]
+        // GET /api/v1/notifications/debug/all - Debug verilerini getir
+        [HttpGet("debug/all")]
         public async Task<IActionResult> DebugUnprocessed()
         {
             var unprocessed = await _context.UnprocessedJobs.ToListAsync();
