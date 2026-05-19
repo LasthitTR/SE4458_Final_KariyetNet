@@ -40,7 +40,22 @@ builder.Services.AddMassTransit(x =>
             throw new InvalidOperationException("RabbitMqConnection is not configured.");
         }
 
-        cfg.Host(new Uri(rabbitMqConnection));
+        var uri = new Uri(rabbitMqConnection);
+        var host = uri.Host;
+        var userInfo = uri.UserInfo.Split(':');
+        var username = userInfo[0];
+        var password = userInfo.Length > 1 ? userInfo[1] : "";
+        var virtualHost = uri.AbsolutePath.TrimStart('/');
+
+        cfg.Host(host, virtualHost, h =>
+        {
+            h.Username(username);
+            h.Password(password);
+            h.UseSsl(s =>
+            {
+                s.Protocol = System.Security.Authentication.SslProtocols.Tls12;
+            });
+        });
     });
 });
 
