@@ -10,10 +10,47 @@ namespace JobSearch.API.Controllers
     public class JobSearchController : ControllerBase
     {
         private readonly IJobSearchService _jobSearchService;
+        private readonly Microsoft.Extensions.Options.IOptions<JobSearch.API.Settings.MongoDbSettings> _mongoSettings;
 
-        public JobSearchController(IJobSearchService jobSearchService)
+        public JobSearchController(
+            IJobSearchService jobSearchService,
+            Microsoft.Extensions.Options.IOptions<JobSearch.API.Settings.MongoDbSettings> mongoSettings)
         {
             _jobSearchService = jobSearchService;
+            _mongoSettings = mongoSettings;
+        }
+
+        [HttpGet("debug-db")]
+        public async Task<IActionResult> DebugDb()
+        {
+            var conn = _mongoSettings.Value.ConnectionString;
+            if (!string.IsNullOrEmpty(conn) && conn.Contains("@"))
+            {
+                var parts = conn.Split('@');
+                conn = "mongodb+srv://***:***@" + parts[1];
+            }
+
+            long count = 0;
+            string error = "";
+            try
+            {
+                var client = new MongoDB.Driver.MongoClient(_mongoSettings.Value.ConnectionString);
+                var db = client.GetDatabase(_mongoSettings.Value.DatabaseName);
+                var col = db.GetCollection<MongoDB.Bson.BsonDocument>(_mongoSettings.Value.CollectionName);
+                count = await col.CountDocumentsAsync(new MongoDB.Bson.BsonDocument());
+            }
+            catch (Exception ex)
+            {
+                error = ex.Message;
+            }
+
+            return Ok(new {
+                ConnectionString = conn,
+                DatabaseName = _mongoSettings.Value.DatabaseName,
+                CollectionName = _mongoSettings.Value.CollectionName,
+                DocumentCount = count,
+                Error = error
+            });
         }
 
         [HttpGet("search")]
