@@ -68,6 +68,14 @@ builder.Services.AddControllers();
 
 var app = builder.Build();
 
+// Yeni tablolar (UserNotifications vb.) varsa otomatik oluştur
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<NotificationDbContext>();
+    db.Database.EnsureCreated();
+}
+
+app.UseRouting();
 app.MapControllers();
 
 app.Run();

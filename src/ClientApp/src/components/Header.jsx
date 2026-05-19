@@ -157,6 +157,16 @@ export default function Header() {
                           ))
                         )}
                       </div>
+                      {notifications.length > 0 && (
+                        <div className="border-t border-gray-100 p-2">
+                          <button
+                            onClick={() => { navigate('/bildirimlerim'); setIsNotifOpen(false); }}
+                            className="w-full text-center text-sm text-blue-600 font-semibold py-2 rounded-xl hover:bg-blue-50 transition"
+                          >
+                            Tüm Bildirimleri Gör →
+                          </button>
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>

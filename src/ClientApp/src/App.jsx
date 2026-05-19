@@ -4,8 +4,9 @@ import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import SearchResultsPage from './pages/SearchResultsPage';
 import JobDetailPage from './pages/JobDetailPage';
-import AdminPage from './pages/AdminPage'; // Eski sayfa, artık işveren olarak kullanıyoruz
+import AdminPage from './pages/AdminPage';
 import SystemAdminPage from './pages/SystemAdminPage';
+import NotificationsPage from './pages/NotificationsPage';
 import AiAgentChat from './components/AiAgentChat';
 import Header from './components/Header';
 import useAuthStore from './store/useAuthStore';
@@ -33,6 +34,7 @@ function App() {
             <Route path="/job/:id" element={<JobDetailPage />} />
             <Route path="/isveren" element={<AdminPage />} />
             <Route path="/admin" element={<SystemAdminPage />} />
+            <Route path="/bildirimlerim" element={<NotificationsPage />} />
           </Routes>
         </main>
 
