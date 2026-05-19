@@ -18,7 +18,12 @@ namespace JobSearch.API.Services
         // Basitlik adına, "JobPostings_Page_1_Size_1000" gibi toplu bir cache'den okuduğumuzu varsayıyoruz.
         private const string CacheKeyPrefix = "JobPostings_Page_1_Size_1000"; 
 
-        public JobSearchService(IOptions<MongoDbSettings> mongoDbSettings, IDistributedCache cache, IMongoClient? mongoClient = null, IEnumerable<UserSearchHistory>? testSearchHistory = null)
+        public JobSearchService(IOptions<MongoDbSettings> mongoDbSettings, IDistributedCache cache)
+            : this(mongoDbSettings, cache, null, null)
+        {
+        }
+
+        public JobSearchService(IOptions<MongoDbSettings> mongoDbSettings, IDistributedCache cache, IMongoClient? mongoClient, IEnumerable<UserSearchHistory>? testSearchHistory)
         {
             var client = mongoClient ?? new MongoClient(mongoDbSettings.Value.ConnectionString);
             var mongoDatabase = client.GetDatabase(mongoDbSettings.Value.DatabaseName);
