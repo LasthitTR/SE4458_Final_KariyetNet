@@ -66,8 +66,21 @@ namespace Notification.Worker.Tasks
                 if (recommendedJob != null)
                 {
                     _logger.LogInformation($"[ÖNERİ] Kullanıcıya ({search.Key}) geçmiş aramasına göre ilan önerildi: {recommendedJob.Title} - {recommendedJob.City}");
+
+                    // Kullanıcıya görünür bildirim kaydı oluştur
+                    var notification = new Notification.Worker.Models.UserNotification
+                    {
+                        UserId = search.Key,
+                        Title = "Size Özel İlan Önerisi 🎯",
+                        Message = $"Geçmiş aramalarınıza göre ilginizi çekebilecek bir ilan bulundu: \"{recommendedJob.Title}\" - {recommendedJob.City}",
+                        JobId = recommendedJob.JobId.ToString(),
+                        IsRead = false,
+                        CreatedAt = DateTime.UtcNow
+                    };
+                    dbContext.UserNotifications.Add(notification);
                 }
             }
+            await dbContext.SaveChangesAsync();
         }
     }
 }

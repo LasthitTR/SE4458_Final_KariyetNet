@@ -11,6 +11,7 @@ namespace Notification.Worker.Data
 
         public DbSet<JobAlert> JobAlerts { get; set; }
         public DbSet<UnprocessedJob> UnprocessedJobs { get; set; }
+        public DbSet<UserNotification> UserNotifications { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -18,6 +19,7 @@ namespace Notification.Worker.Data
             
             modelBuilder.Entity<JobAlert>().HasKey(x => x.Id);
             modelBuilder.Entity<UnprocessedJob>().HasKey(x => x.Id);
+            modelBuilder.Entity<UserNotification>().HasKey(x => x.Id);
         }
     }
 }

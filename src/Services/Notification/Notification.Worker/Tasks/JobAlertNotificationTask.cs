@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Notification.Worker.Data;
+using Notification.Worker.Models;
 using Quartz;
 
 namespace Notification.Worker.Tasks
@@ -19,7 +20,6 @@ namespace Notification.Worker.Tasks
         {
             _logger.LogInformation("JobAlertNotificationTask çalışıyor...");
 
-            // Scoped servisleri kullanmak için scope oluşturuyoruz (Quartz singleton çalışır)
             using var scope = _serviceProvider.CreateScope();
             var dbContext = scope.ServiceProvider.GetRequiredService<NotificationDbContext>();
 
@@ -37,8 +37,19 @@ namespace Notification.Worker.Tasks
 
                 foreach (var alert in matchingAlerts)
                 {
-                    // Mock Bildirim Gönderme
                     _logger.LogInformation($"Kullanıcıya bildirim gönderildi: [{job.Title}] (User: {alert.UserId})");
+
+                    // Kullanıcıya görünür bildirim kaydı oluştur
+                    var notification = new UserNotification
+                    {
+                        UserId = alert.UserId,
+                        Title = "İş Alarmı: Yeni İlan!",
+                        Message = $"Aradığınız kriterlere uygun yeni bir ilan yayınlandı: \"{job.Title}\" - {job.CompanyName} ({job.City})",
+                        JobId = job.JobId.ToString(),
+                        IsRead = false,
+                        CreatedAt = DateTime.UtcNow
+                    };
+                    dbContext.UserNotifications.Add(notification);
                 }
 
                 job.IsProcessed = true;
