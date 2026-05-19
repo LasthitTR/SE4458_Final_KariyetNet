@@ -100,11 +100,6 @@ export default function Header() {
             <Link to="/isveren" className="text-gray-600 hover:text-blue-600 font-medium px-4 py-2">
               İşveren
             </Link>
-            {user && (
-              <Link to="/bildirimlerim" className="text-blue-600 hover:text-blue-700 font-semibold px-4 py-2 bg-blue-50 rounded-xl transition">
-                Bildirimlerim
-              </Link>
-            )}
 
             {user ? (
               <div className="flex items-center gap-3">
