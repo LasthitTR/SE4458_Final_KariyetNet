@@ -24,16 +24,13 @@ builder.Services.AddMassTransit(x =>
 
     x.UsingRabbitMq((context, cfg) =>
     {
-        // Bulut AMQPS bağlantısı (Explicit SSL config)
-        cfg.Host("cow.rmq2.cloudamqp.com", "jhsvgrrk", h =>
+        // Bulut AMQPS bağlantısı (URI formatında otomatik SSL ve port 5671 kullanımı)
+        var rabbitMqConnection = builder.Configuration.GetConnectionString("RabbitMqConnection");
+        if (string.IsNullOrWhiteSpace(rabbitMqConnection))
         {
-            h.Username("jhsvgrrk");
-            h.Password("pSlLz5Xyyrfop-KhPPxGcWEZnTUnFGoL");
-            h.UseSsl(s =>
-            {
-                s.Protocol = System.Security.Authentication.SslProtocols.Tls12;
-            });
-        });
+            rabbitMqConnection = "amqps://jhsvgrrk:pSlLz5Xyyrfop-KhPPxGcWEZnTUnFGoL@cow.rmq2.cloudamqp.com/jhsvgrrk";
+        }
+        cfg.Host(new Uri(rabbitMqConnection));
 
         cfg.ReceiveEndpoint("job-posting-notification-queue", e =>
         {
