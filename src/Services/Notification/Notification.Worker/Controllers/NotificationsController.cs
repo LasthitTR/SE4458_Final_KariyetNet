@@ -65,6 +65,16 @@ namespace Notification.Worker.Controllers
             return Ok(notification);
         }
 
+        // GET /api/v1/notifications/debug-unprocessed - Debug verilerini getir
+        [HttpGet("debug-unprocessed")]
+        public async Task<IActionResult> DebugUnprocessed()
+        {
+            var unprocessed = await _context.UnprocessedJobs.ToListAsync();
+            var notifications = await _context.UserNotifications.ToListAsync();
+            var alerts = await _context.JobAlerts.ToListAsync();
+            return Ok(new { unprocessed, notifications, alerts });
+        }
+
         // DELETE /api/v1/notifications/{id} - Tek bir bildirimi sil
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteNotification(Guid id)
