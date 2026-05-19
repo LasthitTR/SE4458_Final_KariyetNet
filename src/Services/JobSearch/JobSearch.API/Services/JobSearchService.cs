@@ -124,8 +124,8 @@ namespace JobSearch.API.Services
                     SearchDate = DateTime.UtcNow
                 };
 
-                // Asenkron kaydet (Fire and Forget)
-                _ = Task.Run(() => _searchHistoryCollection.InsertOneAsync(searchHistory));
+                // MongoDB'ye kaydet
+                await _searchHistoryCollection.InsertOneAsync(searchHistory);
             }
 
             return pagedResults;
