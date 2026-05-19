@@ -93,7 +93,7 @@ namespace JobPosting.API.Services
 
             try
             {
-                using var cts = new System.Threading.CancellationTokenSource(TimeSpan.FromSeconds(2));
+                using var cts = new System.Threading.CancellationTokenSource(TimeSpan.FromSeconds(15));
                 await _publishEndpoint.Publish(eventMessage, cts.Token);
             }
             catch (Exception ex)
