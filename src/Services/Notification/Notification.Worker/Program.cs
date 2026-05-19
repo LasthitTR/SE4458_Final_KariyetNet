@@ -68,10 +68,12 @@ builder.Services.AddControllers();
 
 var app = builder.Build();
 
-// UserNotifications tablosunu yoksa oluştur (EnsureCreated mevcut DB'de yeni tablo eklemez)
+// Tabloları yoksa oluştur (EF Core EnsureCreated mevcut veritabanında yeni tabloları eklemez)
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<NotificationDbContext>();
+    
+    // UserNotifications Tablosu
     db.Database.ExecuteSqlRaw(@"
         CREATE TABLE IF NOT EXISTS ""UserNotifications"" (
             ""Id"" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -81,6 +83,35 @@ using (var scope = app.Services.CreateScope())
             ""JobId"" text NOT NULL DEFAULT '',
             ""IsRead"" boolean NOT NULL DEFAULT false,
             ""CreatedAt"" timestamp with time zone NOT NULL DEFAULT now()
+        );
+    ");
+
+    // JobAlerts Tablosu
+    db.Database.ExecuteSqlRaw(@"
+        CREATE TABLE IF NOT EXISTS ""JobAlerts"" (
+            ""Id"" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+            ""UserId"" text NOT NULL DEFAULT '',
+            ""Keywords"" text NOT NULL DEFAULT '',
+            ""Country"" text NOT NULL DEFAULT '',
+            ""City"" text NOT NULL DEFAULT '',
+            ""Town"" text NOT NULL DEFAULT '',
+            ""CreatedAt"" timestamp with time zone NOT NULL DEFAULT now()
+        );
+    ");
+
+    // UnprocessedJobs Tablosu
+    db.Database.ExecuteSqlRaw(@"
+        CREATE TABLE IF NOT EXISTS ""UnprocessedJobs"" (
+            ""Id"" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+            ""JobId"" uuid NOT NULL,
+            ""Title"" text NOT NULL DEFAULT '',
+            ""CompanyName"" text NOT NULL DEFAULT '',
+            ""City"" text NOT NULL DEFAULT '',
+            ""Town"" text NOT NULL DEFAULT '',
+            ""WorkingPreference"" text NOT NULL DEFAULT '',
+            ""WorkingType"" text NOT NULL DEFAULT '',
+            ""CreatedAt"" timestamp with time zone NOT NULL,
+            ""IsProcessed"" boolean NOT NULL DEFAULT false
         );
     ");
 }
