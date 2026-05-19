@@ -68,11 +68,21 @@ builder.Services.AddControllers();
 
 var app = builder.Build();
 
-// Yeni tablolar (UserNotifications vb.) varsa otomatik oluştur
+// UserNotifications tablosunu yoksa oluştur (EnsureCreated mevcut DB'de yeni tablo eklemez)
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<NotificationDbContext>();
-    db.Database.EnsureCreated();
+    db.Database.ExecuteSqlRaw(@"
+        CREATE TABLE IF NOT EXISTS ""UserNotifications"" (
+            ""Id"" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+            ""UserId"" text NOT NULL DEFAULT '',
+            ""Title"" text NOT NULL DEFAULT '',
+            ""Message"" text NOT NULL DEFAULT '',
+            ""JobId"" text NOT NULL DEFAULT '',
+            ""IsRead"" boolean NOT NULL DEFAULT false,
+            ""CreatedAt"" timestamp with time zone NOT NULL DEFAULT now()
+        );
+    ");
 }
 
 app.UseRouting();

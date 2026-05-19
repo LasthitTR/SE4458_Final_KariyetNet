@@ -42,5 +42,32 @@ namespace Notification.Worker.Controllers
             await _context.SaveChangesAsync();
             return Ok(new { updated = unread.Count });
         }
+
+        // POST /api/v1/notifications/test - Test amaçlı manuel bildirim oluştur
+        [HttpPost("test")]
+        public async Task<IActionResult> CreateTestNotification([FromBody] TestNotificationRequest request)
+        {
+            if (string.IsNullOrEmpty(request.UserId))
+                return BadRequest("UserId gerekli.");
+
+            var notification = new Notification.Worker.Models.UserNotification
+            {
+                UserId = request.UserId,
+                Title = "🔔 Test Bildirimi",
+                Message = "Bu bir test bildirimidir. Sisteminiz doğru çalışıyor!",
+                JobId = string.Empty,
+                IsRead = false,
+                CreatedAt = DateTime.UtcNow
+            };
+
+            _context.UserNotifications.Add(notification);
+            await _context.SaveChangesAsync();
+            return Ok(notification);
+        }
+    }
+
+    public class TestNotificationRequest
+    {
+        public string UserId { get; set; } = string.Empty;
     }
 }

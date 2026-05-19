@@ -98,7 +98,7 @@
         }
       ],
       "UpstreamPathTemplate": "/api/v1/notifications/{everything}",
-      "UpstreamHttpMethod": [ "GET", "PUT" ]
+      "UpstreamHttpMethod": [ "GET", "PUT", "POST" ]
     }
   ],
   "GlobalConfiguration": {
