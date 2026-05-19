@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import axiosClient from '../utils/axiosClient';
 import useAuthStore from '../store/useAuthStore';
@@ -27,6 +27,14 @@ export default function SearchResultsPage() {
   const [alertCity, setAlertCity] = useState(city || '');
   const [alertTown, setAlertTown] = useState(town || '');
   const [isAlertSubmitting, setIsAlertSubmitting] = useState(false);
+
+  // Toast Bildirimi State
+  const [toast, setToast] = useState(null); // { message, type: 'success' | 'error' }
+
+  const showToast = useCallback((message, type = 'success') => {
+    setToast({ message, type });
+    setTimeout(() => setToast(null), 4000);
+  }, []);
 
   // Sol paneldeki form durumları
   const [filterCity, setFilterCity] = useState(city);
@@ -101,24 +109,24 @@ export default function SearchResultsPage() {
   const handleCreateAlert = async (e) => {
     e.preventDefault();
     if (!user) {
-      alert("İş alarmı oluşturabilmek için lütfen giriş yapın.");
+      showToast("İş alarmı oluşturabilmek için lütfen giriş yapın.", 'error');
       return;
     }
     
     setIsAlertSubmitting(true);
     try {
       await axiosClient.post('/api/v1/jobalerts', {
-        userId: user.id,
+        userId: user.uid,
         keywords: alertKeywords,
         country: alertCountry,
         city: alertCity,
         town: alertTown
       });
-      alert("İş alarmınız başarıyla oluşturuldu! Uygun ilanlar bulunduğunda size bildireceğiz.");
       setIsAlertModalOpen(false);
+      showToast("🔔 İş alarmınız oluşturuldu! Uygun ilanlar bildirim olarak gelecek.", 'success');
     } catch (error) {
       console.error("Alarm oluşturulurken hata:", error);
-      alert("Alarm kaydedilirken bir hata oluştu.");
+      showToast("Alarm kaydedilirken bir hata oluştu. Lütfen tekrar deneyin.", 'error');
     } finally {
       setIsAlertSubmitting(false);
     }
@@ -223,7 +231,7 @@ export default function SearchResultsPage() {
           
           <button 
             onClick={() => {
-              if(!user) { alert("Lütfen önce giriş yapın."); return; }
+              if(!user) { showToast("Lütfen önce giriş yapın.", 'error'); return; }
               setIsAlertModalOpen(true);
             }}
             className="flex items-center bg-indigo-50 text-indigo-700 border border-indigo-200 hover:bg-indigo-600 hover:text-white px-4 py-2 rounded-xl font-semibold transition-all shadow-sm"
@@ -277,6 +285,23 @@ export default function SearchResultsPage() {
           </div>
         )}
       </div>
+
+      {/* Toast Bildirimi */}
+      {toast && (
+        <div className={`fixed bottom-6 left-1/2 -translate-x-1/2 z-[100] flex items-center gap-3 px-6 py-4 rounded-2xl shadow-2xl text-white text-sm font-semibold transition-all animate-fade-in-up ${
+          toast.type === 'success' ? 'bg-gradient-to-r from-green-500 to-emerald-600' : 'bg-gradient-to-r from-red-500 to-rose-600'
+        }`}>
+          {toast.type === 'success' ? (
+            <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+          ) : (
+            <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+          )}
+          <span>{toast.message}</span>
+          <button onClick={() => setToast(null)} className="ml-2 opacity-70 hover:opacity-100">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
+          </button>
+        </div>
+      )}
 
       {/* İş Alarmı Modal'ı */}
       {isAlertModalOpen && (
