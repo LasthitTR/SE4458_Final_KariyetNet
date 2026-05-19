@@ -39,6 +39,12 @@ builder.Services.AddMassTransit(x =>
     });
 });
 
+builder.Services.Configure<MassTransitHostOptions>(options =>
+{
+    options.WaitUntilStarted = false;
+    options.StartTimeout = TimeSpan.FromSeconds(15);
+});
+
 // 3. Quartz.NET (Zamanlanmış Görevler)
 builder.Services.AddQuartz(q =>
 {

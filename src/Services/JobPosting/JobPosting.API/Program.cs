@@ -59,6 +59,12 @@ builder.Services.AddMassTransit(x =>
     });
 });
 
+builder.Services.Configure<MassTransitHostOptions>(options =>
+{
+    options.WaitUntilStarted = false;
+    options.StartTimeout = TimeSpan.FromSeconds(15);
+});
+
 // 4. API Versioning
 builder.Services.AddApiVersioning(options =>
 {
