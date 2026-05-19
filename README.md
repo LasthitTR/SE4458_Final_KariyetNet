@@ -15,9 +15,15 @@ The system leverages various free-tier cloud providers to achieve high availabil
 * **Authentication:** Firebase Auth
 * **API Gateway:** Ocelot API Gateway
 
-## 3. Assumptions
+## 3. Assumptions & Issues Encountered
+**Assumptions:**
 * **AI Agent:** Real-time messaging (WebSockets) is not required per the assignment document. The agent uses a RESTful approach via Hugging Face Inference API with a fallback mechanism (Local NLP) for high availability.
 * **Database Strategy:** To minimize local resource consumption, all databases and message queues are hosted on managed cloud services.
+
+**Issues Encountered & Resolutions:**
+* **Cloud Cold Starts:** Since the microservices are deployed on free-tier cloud instances (Render.com), initial cold starts caused timeouts between the API Gateway and downstream services. This was mitigated by implementing resilient timeout configurations and keeping the Gateway lightweight.
+* **Secret Management Leakage Risks:** Managing multiple cloud credentials (Supabase, MongoDB, Upstash, HuggingFace) created initial risks for secret leakage during GitHub pushes. This was resolved by strictly enforcing `.gitignore` rules and injecting environment variables directly into the cloud providers' CI/CD pipelines.
+* **RabbitMQ SSL Port and Health Check Blockages:** Connecting to CloudAMQP from free-tier Render services initially suffered from SSL handshake timeouts due to port/scheme mismatches (using port 5672 instead of 5671 for TLS). This, combined with MassTransit's default startup-blocking behavior, caused Render's deployment health checks to time out. We resolved this by hardcoding verified SSL URIs and configuring MassTransit to start asynchronously (`WaitUntilStarted = false`), allowing instant deployments and healthy background connection cycles.
 
 ## 4. Repository Layout & Requirements Covered
 * `src/ClientApp` - React frontend
