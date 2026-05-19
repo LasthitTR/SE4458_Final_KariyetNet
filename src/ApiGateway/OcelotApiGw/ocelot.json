@@ -71,10 +71,18 @@
       ],
       "UpstreamPathTemplate": "/api/v1/jobalerts",
       "UpstreamHttpMethod": [ "POST" ],
-      "AuthenticationOptions": {
-        "AuthenticationProviderKey": "Bearer",
-        "AllowedScopes": []
-      }
+    },
+    {
+      "DownstreamPathTemplate": "/api/v1/jobalerts/{everything}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "kariyernet-notification-worker.onrender.com",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/api/v1/jobalerts/{everything}",
+      "UpstreamHttpMethod": [ "GET", "DELETE", "POST" ]
     },
     {
       "DownstreamPathTemplate": "/api/v1/chat",

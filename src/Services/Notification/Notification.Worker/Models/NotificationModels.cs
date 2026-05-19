@@ -35,5 +35,15 @@ namespace Notification.Worker.Models
         public bool IsRead { get; set; } = false;
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     }
+
+    [System.ComponentModel.DataAnnotations.Schema.Table("JobPostings")]
+    public class JobPostingDbModel
+    {
+        public Guid Id { get; set; }
+        public string Title { get; set; } = string.Empty;
+        public string CompanyName { get; set; } = string.Empty;
+        public string City { get; set; } = string.Empty;
+        public string Town { get; set; } = string.Empty;
+    }
 }
 
