@@ -14,6 +14,14 @@ export default function NotificationsPage() {
   const [loading, setLoading] = useState(true);
   const [alertsLoading, setAlertsLoading] = useState(false);
 
+  // Custom Modal State
+  const [confirmModal, setConfirmModal] = useState({
+    isOpen: false,
+    title: '',
+    message: '',
+    onConfirm: null
+  });
+
   // Bildirimleri Getir
   const fetchNotifications = async () => {
     if (!user) return;
@@ -61,41 +69,59 @@ export default function NotificationsPage() {
   }, [activeTab]);
 
   // Tek bildirim sil
-  const handleDeleteNotification = async (notifId, e) => {
+  const handleDeleteNotification = (notifId, e) => {
     e.stopPropagation();
-    if (!window.confirm('Bu bildirimi silmek istediğinizden emin misiniz?')) return;
-
-    try {
-      await axiosClient.delete(`/api/v1/notifications/${notifId}`);
-      setNotifications(prev => prev.filter(n => n.id !== notifId));
-    } catch (err) {
-      console.error('Bildirim silinemedi:', err);
-    }
+    setConfirmModal({
+      isOpen: true,
+      title: 'Bildirimi Sil',
+      message: 'Bu bildirimi kalıcı olarak silmek istediğinizden emin misiniz?',
+      onConfirm: async () => {
+        try {
+          await axiosClient.delete(`/api/v1/notifications/${notifId}`);
+          setNotifications(prev => prev.filter(n => n.id !== notifId));
+        } catch (err) {
+          console.error('Bildirim silinemedi:', err);
+        }
+        setConfirmModal(prev => ({ ...prev, isOpen: false }));
+      }
+    });
   };
 
   // Tüm bildirimleri sil
-  const handleDeleteAllNotifications = async () => {
-    if (!window.confirm('Tüm bildirimlerinizi silmek istediğinizden emin misiniz?')) return;
-
-    try {
-      await axiosClient.delete(`/api/v1/notifications/user/${user.uid}`);
-      setNotifications([]);
-    } catch (err) {
-      console.error('Tüm bildirimler silinemedi:', err);
-    }
+  const handleDeleteAllNotifications = () => {
+    setConfirmModal({
+      isOpen: true,
+      title: 'Tüm Bildirimleri Sil',
+      message: 'Tüm bildirimlerinizi kalıcı olarak silmek istediğinizden emin misiniz?',
+      onConfirm: async () => {
+        try {
+          await axiosClient.delete(`/api/v1/notifications/user/${user.uid}`);
+          setNotifications([]);
+        } catch (err) {
+          console.error('Tüm bildirimler silinemedi:', err);
+        }
+        setConfirmModal(prev => ({ ...prev, isOpen: false }));
+      }
+    });
   };
 
   // Alarm sil
-  const handleDeleteAlert = async (alertId, e) => {
+  const handleDeleteAlert = (alertId, e) => {
     e.stopPropagation();
-    if (!window.confirm('Bu iş alarmını silmek istediğinizden emin misiniz?')) return;
-
-    try {
-      await axiosClient.delete(`/api/v1/jobalerts/${alertId}`);
-      setAlerts(prev => prev.filter(a => a.id !== alertId));
-    } catch (err) {
-      console.error('Alarm silinemedi:', err);
-    }
+    setConfirmModal({
+      isOpen: true,
+      title: 'İş Alarmını Sil',
+      message: 'Bu iş alarmını kalıcı olarak silmek istediğinizden emin misiniz?',
+      onConfirm: async () => {
+        try {
+          await axiosClient.delete(`/api/v1/jobalerts/${alertId}`);
+          setAlerts(prev => prev.filter(a => a.id !== alertId));
+        } catch (err) {
+          console.error('Alarm silinemedi:', err);
+        }
+        setConfirmModal(prev => ({ ...prev, isOpen: false }));
+      }
+    });
   };
 
   const handleAlertClick = (alert) => {
@@ -131,7 +157,7 @@ export default function NotificationsPage() {
           </button>
         </div>
 
-        {/* Tümünü Sil butonu (Sadece Bildirimler sekmesindeyken ve bildirim varsa gösterilir) */}
+        {/* Tümünü Sil butonu */}
         {activeTab === 'notifications' && notifications.length > 0 && (
           <button
             onClick={handleDeleteAllNotifications}
@@ -275,6 +301,39 @@ export default function NotificationsPage() {
             ))}
           </div>
         )
+      )}
+
+      {/* Modern Custom Confirmation Modal */}
+      {confirmModal.isOpen && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4 backdrop-blur-sm transition-opacity duration-300">
+          <div className="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl border border-gray-100 transform scale-100 transition-transform duration-300">
+            <div className="w-12 h-12 rounded-full bg-red-100 text-red-600 flex items-center justify-center mb-4">
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+              </svg>
+            </div>
+            <h3 className="text-lg font-bold text-gray-900 mb-2">
+              {confirmModal.title}
+            </h3>
+            <p className="text-gray-500 text-sm mb-6 leading-relaxed">
+              {confirmModal.message}
+            </p>
+            <div className="flex gap-3 justify-end">
+              <button
+                onClick={() => setConfirmModal(prev => ({ ...prev, isOpen: false }))}
+                className="px-4 py-2.5 text-sm font-semibold text-gray-500 hover:text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-xl transition"
+              >
+                Vazgeç
+              </button>
+              <button
+                onClick={confirmModal.onConfirm}
+                className="px-4 py-2.5 text-sm font-semibold text-white bg-red-600 hover:bg-red-700 rounded-xl shadow-md transition"
+              >
+                Evet, Sil
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
