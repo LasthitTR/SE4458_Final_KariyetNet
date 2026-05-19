@@ -106,6 +106,7 @@ dotnet test tests/JobPosting.API.Tests/JobPosting.API.Tests.csproj
 ## 6. Deployed URLs
 * **Frontend:** https://se-4458-final-kariyet-net.vercel.app/
 * **API Gateway:** https://kariyernet-apigateway.onrender.com
+* **Notification Service:** https://kariyernet-notification-worker.onrender.com
 
 ---
 
