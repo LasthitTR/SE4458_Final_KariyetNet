@@ -33,29 +33,8 @@ builder.Services.AddMassTransit(x =>
 {
     x.UsingRabbitMq((context, cfg) =>
     {
-        var rabbitMqConnection = builder.Configuration.GetConnectionString("RabbitMqConnection");
-
-        if (string.IsNullOrWhiteSpace(rabbitMqConnection))
-        {
-            throw new InvalidOperationException("RabbitMqConnection is not configured.");
-        }
-
-        var uri = new Uri(rabbitMqConnection);
-        var host = uri.Host;
-        var userInfo = uri.UserInfo.Split(':');
-        var username = userInfo[0];
-        var password = userInfo.Length > 1 ? userInfo[1] : "";
-        var virtualHost = uri.AbsolutePath.TrimStart('/');
-
-        cfg.Host(host, virtualHost, h =>
-        {
-            h.Username(username);
-            h.Password(password);
-            h.UseSsl(s =>
-            {
-                s.Protocol = System.Security.Authentication.SslProtocols.Tls12;
-            });
-        });
+        // Bulut AMQPS bağlantısı (Doğrulanmış sabit URI ile otomatik SSL ve port 5671)
+        cfg.Host(new Uri("amqps://jhsvgrrk:pSlLz5Xyyrfop-KhPPxGcWEZnTUnFGoL@cow.rmq2.cloudamqp.com/jhsvgrrk"));
     });
 });
 
