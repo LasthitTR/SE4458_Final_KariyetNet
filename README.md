@@ -104,9 +104,12 @@ dotnet test tests/JobPosting.API.Tests/JobPosting.API.Tests.csproj
 ```
 
 ## 6. Deployed URLs
-* **Frontend:** https://se-4458-final-kariyet-net.vercel.app/
-* **API Gateway:** https://kariyernet-apigateway.onrender.com
-* **Notification Service:** https://kariyernet-notification-worker.onrender.com
+* **Frontend (React UI):** https://se-4458-final-kariyet-net.vercel.app/
+* **API Gateway (Ingress Router):** https://kariyernet-apigateway.onrender.com
+* **Job Posting Service (PostgreSQL write API):** https://kariyernet-jobposting-api.onrender.com
+* **Job Search Service (MongoDB/Redis read API):** https://kariyernet-jobsearch-api.onrender.com
+* **AI Agent Service (NLP chat helper API):** https://kariyernet-aiagent-api.onrender.com
+* **Notification Service (Alerts/Background worker):** https://kariyernet-notification-worker.onrender.com
 
 ---
 
