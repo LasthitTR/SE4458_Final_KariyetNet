@@ -1,8 +1,5 @@
 # KariyetNet - Job Search Web Application
 
-🎥 **Project Presentation Video:** [Watch on Google Drive](https://drive.google.com/file/d/1Gmy4d8c_XWMakckdmIQOHfUtCjpPwz_S/view?usp=sharing)
-
-
 ## 1. Project Overview
 KariyetNet is a group project for SE 4458 that implements a job search web application similar to kariyer.net. It is designed with a **Serverless & Managed Cloud** approach, eliminating the need for local database installations or Docker containers during runtime.
 
